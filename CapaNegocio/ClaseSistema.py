@@ -6,7 +6,7 @@ from CapaNegocio.ClaseValidaciones import ClaseValidaciones
 from CapaDatos.ClaseSQL import ClaseSQL
 from CapaDatos.ClaseMONGO import ClaseMONGO
 from CapaDatos.ClaseXmlManager import cargarLecturasXML
-from datetime import datetime
+from datetime import datetime, date
 
 
 sql_db = ClaseSQL()
@@ -20,7 +20,7 @@ ListaAlertas = []
 ListaCalculoVolumen = []
 
 
-# ================== Helpers ==================
+# ================== Transformadores ==================
 def _parcela_a_dict(parcela):
     return {
         "idParcela": parcela.idParcela,
@@ -130,9 +130,22 @@ def cargar_alertas_db():
 def cargar_calculos_riego_db():
     ListaCalculoVolumen.clear()
     for row in sql_db.obtenerCalculosRiego():
-        ListaCalculoVolumen.append(
-            {"idParcela": str(row[0]), "fecha": row[1], "volumenRiego": float(row[2])}
+        fecha_val = getattr(row, "fecha", None)
+        volumen_val = getattr(row, "volumenRiego", None)
+        if fecha_val is None and len(row) >= 2:
+            fecha_val = row[1]
+        if volumen_val is None and len(row) >= 3:
+            volumen_val = row[2]
+        # Si vienen invertidos por el orden de columnas, corrige.
+        if isinstance(volumen_val, (datetime, date)) and not isinstance(fecha_val, (datetime, date)):
+            fecha_val, volumen_val = volumen_val, fecha_val
+
+        fecha_str = (
+            fecha_val.strftime("%d-%m-%Y") if isinstance(fecha_val, (datetime, date)) else str(fecha_val)
         )
+        volumen_num = float(volumen_val) if volumen_val is not None else 0.0
+
+        ListaCalculoVolumen.append({"idParcela": str(row[0]), "fecha": fecha_str, "volumenRiego": volumen_num})
 
 
 def cargar_lecturas_desde_xml(ruta="./Lecturas.xml"):

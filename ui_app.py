@@ -12,7 +12,7 @@ except ImportError:
 def _safe_get(entry):
     return entry.get().strip()
 
-
+## FRAME PARCELA
 class ParcelaTab(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -154,6 +154,7 @@ class ParcelaTab(ttk.Frame):
             messagebox.showerror("Error", str(exc))
 
 
+## FRAME SENSOR
 class SensorTab(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -308,7 +309,7 @@ class SensorTab(ttk.Frame):
                 ),
             )
 
-
+### FRAME LECTURA
 class LecturaTab(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -413,7 +414,7 @@ class LecturaTab(ttk.Frame):
         for entry in self.inputs.values():
             entry.delete(0, tk.END)
 
-
+## FRAME XML
 class XmlTab(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -439,7 +440,7 @@ class XmlTab(ttk.Frame):
         except Exception as exc:
             messagebox.showerror("Error", str(exc))
 
-
+### FRAME GRAFICO
 class GraficoTab(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -447,14 +448,14 @@ class GraficoTab(ttk.Frame):
         self.parcela_entry = ttk.Entry(self, width=15)
         self.parcela_entry.grid(row=0, column=1, padx=4, pady=4, sticky="ew")
 
-        ttk.Label(self, text="IDs sensores (coma)").grid(row=0, column=2, padx=4, pady=4, sticky="w")
+        ttk.Label(self, text="IDs Sensores (Separados por ,)").grid(row=0, column=2, padx=4, pady=4, sticky="w")
         self.sensores_entry = ttk.Entry(self, width=20)
         self.sensores_entry.grid(row=0, column=3, padx=4, pady=4, sticky="ew")
 
-        ttk.Label(self, text="Fecha inicio (DD-MM-YYYY)").grid(row=1, column=0, padx=4, pady=4, sticky="w")
+        ttk.Label(self, text="Fecha Inicio (DD-MM-YYYY)").grid(row=1, column=0, padx=4, pady=4, sticky="w")
         self.fecha_ini_entry = ttk.Entry(self, width=15)
         self.fecha_ini_entry.grid(row=1, column=1, padx=4, pady=4, sticky="ew")
-        ttk.Label(self, text="Fecha fin (DD-MM-YYYY)").grid(row=1, column=2, padx=4, pady=4, sticky="w")
+        ttk.Label(self, text="Fecha Fin (DD-MM-YYYY)").grid(row=1, column=2, padx=4, pady=4, sticky="w")
         self.fecha_fin_entry = ttk.Entry(self, width=15)
         self.fecha_fin_entry.grid(row=1, column=3, padx=4, pady=4, sticky="ew")
 
@@ -503,6 +504,10 @@ class GraficoTab(ttk.Frame):
         self.figure = Figure(figsize=(7, 4), dpi=100)
         ax = self.figure.add_subplot(111)
         ax.scatter(fechas, valores, c=colors)
+        ordenados = sorted(zip(fechas, valores), key=lambda x: x[0])
+        if ordenados:
+            line_x, line_y = zip(*ordenados)
+            ax.plot(line_x, line_y, color="#888888", linewidth=1.5, alpha=0.8)
         ax.set_xlabel("Fecha y Hora")
         ax.set_ylabel("Valor medido")
         ax.set_title(f"Lecturas parcela {parcela}")
@@ -517,7 +522,7 @@ class GraficoTab(ttk.Frame):
             self.canvas.get_tk_widget().destroy()
             self.canvas = None
 
-
+### FRAME ALERTA
 class AlertaTab(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -586,7 +591,7 @@ class AlertaTab(ttk.Frame):
         self.parcela_entry.delete(0, tk.END)
         self.fecha_entry.delete(0, tk.END)
 
-
+### FRAME RIEGO
 class RiegoTab(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -638,7 +643,7 @@ class RiegoTab(ttk.Frame):
         for c in svc.listar_calculos_riego():
             self.tree.insert("", "end", values=(c["idParcela"], c["fecha"], c["volumenRiego"]))
 
-
+### APLICACION PRINCIPAL
 class App(tk.Tk):
     def __init__(self):
         super().__init__()

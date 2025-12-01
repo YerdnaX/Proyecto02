@@ -1,4 +1,5 @@
 import pyodbc
+from datetime import datetime
 
 
 class ClaseSQL:
@@ -111,6 +112,11 @@ class ClaseSQL:
 
     # ========== CALCULO RIEGO ==========
     def insertarCalculoRiego(self, calculo):
+        fecha_valor = calculo["fecha"]
+        try:
+            fecha_dt = datetime.strptime(fecha_valor, "%d-%m-%Y")
+        except ValueError:
+            fecha_dt = datetime.strptime(fecha_valor, "%d-%m-%Y %H:%M:%S")
         self.cursor.execute(
             """
             INSERT INTO CalculoVolumenRiego (idParcela, fecha, volumenRiego)
@@ -118,7 +124,7 @@ class ClaseSQL:
             """,
             (
                 calculo["idParcela"],
-                calculo["fecha"],
+                fecha_dt,
                 calculo["volumenRiego"],
             ),
         )
