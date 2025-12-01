@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from CapaNegocio import ClaseSistema as svc
+import pandas as pd
 try:
     from matplotlib.figure import Figure
     from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -487,9 +488,10 @@ class GraficoTab(ttk.Frame):
         if not lecturas:
             messagebox.showinfo("Sin datos", "No hay lecturas para esos filtros")
             return
-        fechas = [l["fechaHora"] for l in lecturas]
-        valores = [float(l["valorMedido"]) for l in lecturas]
-        sensores_ids = [l["idSensor"] for l in lecturas]
+        df = pd.DataFrame(lecturas)
+        df["valorMedido"] = df["valorMedido"].astype(float)
+        df["fechaHora"] = pd.to_datetime(df["fechaHora"], format="%d-%m-%Y %H:%M:%S", errors="coerce")
+        df = df.sort_values("fechaHora")
 
         color_map = {}
         palette = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:brown", "tab:pink", "tab:gray", "tab:olive", "tab:cyan"]
@@ -497,17 +499,15 @@ class GraficoTab(ttk.Frame):
             if sensor not in color_map:
                 color_map[sensor] = palette[len(color_map) % len(palette)]
             return color_map[sensor]
-        colors = [color_for(s) for s in sensores_ids]
+        df["color"] = df["idSensor"].apply(color_for)
 
         if self.canvas:
             self.canvas.get_tk_widget().destroy()
         self.figure = Figure(figsize=(7, 4), dpi=100)
         ax = self.figure.add_subplot(111)
-        ax.scatter(fechas, valores, c=colors)
-        ordenados = sorted(zip(fechas, valores), key=lambda x: x[0])
-        if ordenados:
-            line_x, line_y = zip(*ordenados)
-            ax.plot(line_x, line_y, color="#888888", linewidth=1.5, alpha=0.8)
+        ax.scatter(df["fechaHora"], df["valorMedido"], c=df["color"])
+        if not df.empty:
+            ax.plot(df["fechaHora"], df["valorMedido"], color="#888888", linewidth=1.5, alpha=0.8)
         ax.set_xlabel("Fecha y Hora")
         ax.set_ylabel("Valor medido")
         ax.set_title(f"Lecturas parcela {parcela}")
