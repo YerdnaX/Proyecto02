@@ -1,5 +1,5 @@
 from CapaNegocio import ClaseSistema as svc
-from ui_app import App
+from ClaseVisual import App
 
 
 def main():

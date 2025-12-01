@@ -54,9 +54,9 @@ class ParcelaTab(ttk.Frame):
         ]
         self.inputs = {}
         for i, label in enumerate(labels):
-            ttk.Label(self, text=label).grid(row=1 + i // 2, column=(i % 2) * 2, sticky="w", padx=4, pady=2)
+            ttk.Label(self, text=label).grid(row=1 + i // 2, column=(i % 2) * 2, sticky="w", padx=2, pady=1)
             entry = ttk.Entry(self, width=24)
-            entry.grid(row=1 + i // 2, column=(i % 2) * 2 + 1, sticky="ew", padx=4, pady=2)
+            entry.grid(row=1 + i // 2, column=(i % 2) * 2 + 1, sticky="ew", padx=2, pady=1)
             self.inputs[label] = entry
 
         ttk.Button(self, text="Crear/Actualizar", command=self.save).grid(row=6, column=0, padx=4, pady=6, sticky="ew")
@@ -184,23 +184,23 @@ class SensorTab(ttk.Frame):
         labels = ["ID", "Tipo", "ID Parcela", "Estado", "Ubicacion", "Unidad", "Rango"]
         self.inputs = {}
         for i, label in enumerate(labels):
-            ttk.Label(self, text=label).grid(row=1 + i // 2, column=(i % 2) * 2, sticky="w", padx=4, pady=2)
+            ttk.Label(self, text=label).grid(row=1 + i // 2, column=(i % 2) * 2, sticky="w", padx=2, pady=1)
             if label == "Tipo":
                 entry = ttk.Combobox(self, values=["humedadsuelo", "temperatura", "lluvia"], width=22, state="readonly")
             elif label == "Estado":
                 entry = ttk.Combobox(self, values=["activo", "inactivo", "mantenimiento", "revision"], width=22, state="readonly")
             else:
                 entry = ttk.Entry(self, width=24)
-            entry.grid(row=1 + i // 2, column=(i % 2) * 2 + 1, sticky="ew", padx=4, pady=2)
+            entry.grid(row=1 + i // 2, column=(i % 2) * 2 + 1, sticky="ew", padx=2, pady=1)
             self.inputs[label] = entry
 
         ttk.Button(self, text="Crear/Actualizar", command=self.save).grid(row=5, column=0, padx=4, pady=6, sticky="ew")
         ttk.Button(self, text="Eliminar", command=self.delete).grid(row=5, column=1, padx=4, pady=6, sticky="ew")
         ttk.Button(self, text="Refrescar", command=self.refresh).grid(row=5, column=2, padx=4, pady=6, sticky="ew")
-        ttk.Label(self, text="Filtrar por Parcela").grid(row=6, column=0, padx=4, pady=4, sticky="w")
+        ttk.Label(self, text="Filtrar por parcela").grid(row=6, column=0, padx=2, pady=2, sticky="w")
         self.filter_entry = ttk.Entry(self, width=20)
-        self.filter_entry.grid(row=6, column=1, padx=4, pady=4, sticky="ew")
-        ttk.Button(self, text="Aplicar Filtro", command=self.filter_by_parcela).grid(row=6, column=2, padx=4, pady=4, sticky="ew")
+        self.filter_entry.grid(row=6, column=1, padx=2, pady=2, sticky="ew")
+        ttk.Button(self, text="Aplicar filtro", command=self.filter_by_parcela).grid(row=6, column=2, padx=2, pady=2, sticky="ew")
 
         self.refresh()
 
@@ -335,16 +335,16 @@ class LecturaTab(ttk.Frame):
         labels = ["ID Lectura", "ID Sensor", "ID Parcela", "FechaHora (DD-MM-YYYY HH:MM:SS)", "Valor"]
         self.inputs = {}
         for i, label in enumerate(labels):
-            ttk.Label(self, text=label).grid(row=1 + i // 2, column=(i % 2) * 2, sticky="w", padx=4, pady=2)
+            ttk.Label(self, text=label).grid(row=1 + i // 2, column=(i % 2) * 2, sticky="w", padx=2, pady=1)
             entry = ttk.Entry(self, width=28)
-            entry.grid(row=1 + i // 2, column=(i % 2) * 2 + 1, sticky="ew", padx=4, pady=2)
+            entry.grid(row=1 + i // 2, column=(i % 2) * 2 + 1, sticky="ew", padx=2, pady=1)
             self.inputs[label] = entry
 
-        ttk.Button(self, text="Agregar Lectura", command=self.save).grid(row=4, column=0, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Filtrar por Sensor", command=self.filter_sensor).grid(row=4, column=1, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Filtrar por Parcela", command=self.filter_parcela).grid(row=4, column=2, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Filtrar por Fecha", command=self.filter_fecha).grid(row=4, column=3, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Borrar por Parcela/Fecha", command=self.delete_por_parcela_fecha).grid(row=5, column=0, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Agregar lectura", command=self.save).grid(row=4, column=0, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Filtrar por sensor", command=self.filter_sensor).grid(row=4, column=1, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Filtrar por parcela", command=self.filter_parcela).grid(row=4, column=2, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Filtrar por fecha", command=self.filter_fecha).grid(row=4, column=3, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Borrar por parcela/fecha", command=self.delete_por_parcela_fecha).grid(row=5, column=0, padx=4, pady=6, sticky="ew")
         ttk.Button(self, text="Refrescar", command=self.refresh_all).grid(row=5, column=1, padx=4, pady=6, sticky="ew")
 
         self.refresh_all()
@@ -547,13 +547,13 @@ class AlertaTab(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-        ttk.Label(self, text="ID Parcela").grid(row=1, column=0, padx=4, pady=2, sticky="w")
+        ttk.Label(self, text="ID Parcela").grid(row=1, column=0, padx=2, pady=1, sticky="w")
         self.parcela_entry = ttk.Entry(self, width=20)
-        self.parcela_entry.grid(row=1, column=1, padx=4, pady=2, sticky="ew")
+        self.parcela_entry.grid(row=1, column=1, padx=2, pady=1, sticky="ew")
 
-        ttk.Label(self, text="Fecha (DD-MM-YYYY)").grid(row=1, column=2, padx=4, pady=2, sticky="w")
+        ttk.Label(self, text="Fecha (DD-MM-YYYY)").grid(row=1, column=2, padx=2, pady=1, sticky="w")
         self.fecha_entry = ttk.Entry(self, width=20)
-        self.fecha_entry.grid(row=1, column=3, padx=4, pady=2, sticky="ew")
+        self.fecha_entry.grid(row=1, column=3, padx=2, pady=1, sticky="ew")
 
         ttk.Button(self, text="Filtrar por parcela", command=self.filter_parcela).grid(row=2, column=0, padx=4, pady=6, sticky="ew")
         ttk.Button(self, text="Filtrar por parcela/fecha", command=self.filter_parcela_fecha).grid(row=2, column=1, padx=4, pady=6, sticky="ew")
@@ -597,11 +597,11 @@ class RiegoTab(ttk.Frame):
         super().__init__(master)
         ttk.Label(self, text="ID Parcela").grid(row=0, column=0, padx=4, pady=4, sticky="w")
         self.parcela_entry = ttk.Entry(self, width=18)
-        self.parcela_entry.grid(row=0, column=1, padx=4, pady=4, sticky="ew")
+        self.parcela_entry.grid(row=0, column=1, padx=2, pady=2, sticky="ew")
 
         ttk.Label(self, text="Fecha (DD-MM-YYYY)").grid(row=0, column=2, padx=4, pady=4, sticky="w")
         self.fecha_entry = ttk.Entry(self, width=18)
-        self.fecha_entry.grid(row=0, column=3, padx=4, pady=4, sticky="ew")
+        self.fecha_entry.grid(row=0, column=3, padx=2, pady=2, sticky="ew")
 
         ttk.Button(self, text="Calcular", command=self.calcular).grid(row=1, column=0, padx=4, pady=6, sticky="ew")
         ttk.Button(self, text="Refrescar historial", command=self.refresh_historial).grid(row=1, column=1, padx=4, pady=6, sticky="ew")
