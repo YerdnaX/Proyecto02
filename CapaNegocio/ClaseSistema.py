@@ -483,6 +483,8 @@ def calcular_volumen_riego(idParcelaVer, fechaVer):
 
     for parcela in ListaParcelas:
         if parcela.idParcela == idParcelaVer:
+            if parcela.area in (None, "") or parcela.eficienciaRiego in (None, "") or parcela.profundidadRaiz in (None, "") or parcela.volumenDeseado in (None, ""):
+                raise ValueError("Complete los datos numericos de la parcela (area, eficiencia, profundidad, volumen deseado) antes de calcular.")
             areaParcela = float(parcela.area)
             eficienciaRiego = float(parcela.eficienciaRiego)
             profundidadRaiz = float(parcela.profundidadRaiz)

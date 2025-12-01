@@ -18,11 +18,12 @@ class ParcelaTab(ttk.Frame):
         super().__init__(master)
         self.tree = ttk.Treeview(
             self,
-            columns=("nombre", "ubicacion", "cultivo", "area", "humMin", "humMax", "volumen"),
+            columns=("id", "nombre", "ubicacion", "cultivo", "area", "humMin", "humMax", "volumen"),
             show="headings",
             height=8,
         )
         headings = [
+            ("id", "ID"),
             ("nombre", "Nombre"),
             ("ubicacion", "Ubicacion"),
             ("cultivo", "Cultivo"),
@@ -92,6 +93,7 @@ class ParcelaTab(ttk.Frame):
             self.inputs[label].insert(0, data.get(key, ""))
 
     def refresh(self):
+        self._clear_form()
         self.tree.delete(*self.tree.get_children())
         for p in svc.listar_parcelas():
             self.tree.insert(
@@ -99,6 +101,7 @@ class ParcelaTab(ttk.Frame):
                 "end",
                 iid=p["idParcela"],
                 values=(
+                    p["idParcela"],
                     p["nombre"],
                     p["ubicacion"],
                     p["tipoCultivo"],
@@ -108,6 +111,10 @@ class ParcelaTab(ttk.Frame):
                     p["volumenDeseado"],
                 ),
             )
+
+    def _clear_form(self):
+        for entry in self.inputs.values():
+            entry.delete(0, tk.END)
 
     def save(self):
         data = {
@@ -152,11 +159,12 @@ class SensorTab(ttk.Frame):
         super().__init__(master)
         self.tree = ttk.Treeview(
             self,
-            columns=("tipo", "parcela", "estado", "ubicacion", "unidad", "rango"),
+            columns=("id", "tipo", "parcela", "estado", "ubicacion", "unidad", "rango"),
             show="headings",
             height=8,
         )
         headings = [
+            ("id", "ID"),
             ("tipo", "Tipo"),
             ("parcela", "Parcela"),
             ("estado", "Estado"),
@@ -176,7 +184,12 @@ class SensorTab(ttk.Frame):
         self.inputs = {}
         for i, label in enumerate(labels):
             ttk.Label(self, text=label).grid(row=1 + i // 2, column=(i % 2) * 2, sticky="w", padx=4, pady=2)
-            entry = ttk.Entry(self, width=24)
+            if label == "Tipo":
+                entry = ttk.Combobox(self, values=["humedadsuelo", "temperatura", "lluvia"], width=22, state="readonly")
+            elif label == "Estado":
+                entry = ttk.Combobox(self, values=["activo", "inactivo", "mantenimiento", "revision"], width=22, state="readonly")
+            else:
+                entry = ttk.Entry(self, width=24)
             entry.grid(row=1 + i // 2, column=(i % 2) * 2 + 1, sticky="ew", padx=4, pady=2)
             self.inputs[label] = entry
 
@@ -214,14 +227,17 @@ class SensorTab(ttk.Frame):
             self.inputs[label].delete(0, tk.END)
             self.inputs[label].insert(0, data.get(key, ""))
 
-    def refresh(self):
+    def filter_by_parcela(self):
+        pid = _safe_get(self.filter_entry)
         self.tree.delete(*self.tree.get_children())
-        for s in svc.listar_sensores():
+        sensores = [s for s in svc.listar_sensores() if (not pid or s["idParcela"] == pid)]
+        for s in sensores:
             self.tree.insert(
                 "",
                 "end",
                 iid=s["idSensor"],
                 values=(
+                    s["idSensor"],
                     s["tipo"],
                     s["idParcela"],
                     s["estado"],
@@ -230,12 +246,6 @@ class SensorTab(ttk.Frame):
                     s["rangoValido"],
                 ),
             )
-    def filter_by_parcela(self):
-        pid = _safe_get(self.filter_entry)
-        self.tree.delete(*self.tree.get_children())
-        sensores = [s for s in svc.listar_sensores() if (not pid or s["idParcela"] == pid)]
-        for s in sensores:
-            self.tree.insert("", "end", iid=s["idSensor"], values=(s["tipo"], s["idParcela"], s["estado"], s["ubicacionParcela"], s["unidadMedida"], s["rangoValido"]))
 
     def save(self):
         data = {
@@ -271,17 +281,50 @@ class SensorTab(ttk.Frame):
         except Exception as exc:
             messagebox.showerror("Error", str(exc))
 
+    def _clear_form(self):
+        for label, widget in self.inputs.items():
+            if hasattr(widget, "set"):
+                widget.set("")
+            else:
+                widget.delete(0, tk.END)
+        self.filter_entry.delete(0, tk.END)
+
+    def refresh(self):
+        self._clear_form()
+        self.tree.delete(*self.tree.get_children())
+        for s in svc.listar_sensores():
+            self.tree.insert(
+                "",
+                "end",
+                iid=s["idSensor"],
+                values=(
+                    s["idSensor"],
+                    s["tipo"],
+                    s["idParcela"],
+                    s["estado"],
+                    s["ubicacionParcela"],
+                    s["unidadMedida"],
+                    s["rangoValido"],
+                ),
+            )
+
 
 class LecturaTab(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
         self.tree = ttk.Treeview(
             self,
-            columns=("sensor", "parcela", "fecha", "valor"),
+            columns=("idLectura", "sensor", "parcela", "fecha", "valor"),
             show="headings",
             height=10,
         )
-        for col, text in [("sensor", "Sensor"), ("parcela", "Parcela"), ("fecha", "Fecha"), ("valor", "Valor")]:
+        for col, text in [
+            ("idLectura", "ID Lectura"),
+            ("sensor", "Sensor"),
+            ("parcela", "Parcela"),
+            ("fecha", "Fecha"),
+            ("valor", "Valor"),
+        ]:
             self.tree.heading(col, text=text)
             self.tree.column(col, width=130, anchor="w")
         self.tree.grid(row=0, column=0, columnspan=4, sticky="nsew", padx=4, pady=4)
@@ -301,15 +344,21 @@ class LecturaTab(ttk.Frame):
         ttk.Button(self, text="Filtrar por parcela", command=self.filter_parcela).grid(row=4, column=2, padx=4, pady=6, sticky="ew")
         ttk.Button(self, text="Filtrar por fecha", command=self.filter_fecha).grid(row=4, column=3, padx=4, pady=6, sticky="ew")
         ttk.Button(self, text="Borrar por parcela/fecha", command=self.delete_por_parcela_fecha).grid(row=5, column=0, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Reset", command=self.refresh_all).grid(row=5, column=1, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Refrescar", command=self.refresh_all).grid(row=5, column=1, padx=4, pady=6, sticky="ew")
 
         self.refresh_all()
 
     def refresh_all(self, data=None):
+        self._clear_form()
         self.tree.delete(*self.tree.get_children())
         lecturas = data if data is not None else svc.listar_lecturas()
         for l in lecturas:
-            self.tree.insert("", "end", iid=l["idLectura"], values=(l["idSensor"], l["idParcela"], l["fechaHora"], l["valorMedido"]))
+            self.tree.insert(
+                "",
+                "end",
+                iid=l["idLectura"],
+                values=(l["idLectura"], l["idSensor"], l["idParcela"], l["fechaHora"], l["valorMedido"]),
+            )
 
     def save(self):
         data = {
@@ -359,6 +408,10 @@ class LecturaTab(ttk.Frame):
             messagebox.showinfo("Listo", f"Eliminadas {borradas} lecturas")
         except Exception as exc:
             messagebox.showerror("Error", str(exc))
+
+    def _clear_form(self):
+        for entry in self.inputs.values():
+            entry.delete(0, tk.END)
 
 
 class XmlTab(ttk.Frame):
@@ -499,11 +552,12 @@ class AlertaTab(ttk.Frame):
 
         ttk.Button(self, text="Filtrar por parcela", command=self.filter_parcela).grid(row=2, column=0, padx=4, pady=6, sticky="ew")
         ttk.Button(self, text="Filtrar por parcela/fecha", command=self.filter_parcela_fecha).grid(row=2, column=1, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Reset", command=self.refresh_all).grid(row=2, column=2, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Refrescar", command=self.refresh_all).grid(row=2, column=2, padx=4, pady=6, sticky="ew")
 
         self.refresh_all()
 
     def refresh_all(self, data=None):
+        self._clear_form()
         self.tree.delete(*self.tree.get_children())
         alertas = data if data is not None else svc.listar_alertas()
         for a in alertas:
@@ -527,6 +581,10 @@ class AlertaTab(ttk.Frame):
             messagebox.showwarning("Falta dato", "Ingrese parcela y fecha (DD-MM-YYYY)")
             return
         self.refresh_all(svc.alertas_por_parcela_fecha(pid, fecha))
+
+    def _clear_form(self):
+        self.parcela_entry.delete(0, tk.END)
+        self.fecha_entry.delete(0, tk.END)
 
 
 class RiegoTab(ttk.Frame):
