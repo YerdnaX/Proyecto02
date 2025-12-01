@@ -22,7 +22,7 @@ def menu() -> int:
                 return opcionfinal
             case 3:
                 opcionfinal = menuLecturaSensores()
-                if opcionfinal == 37:
+                if opcionfinal == 36:
                     continue
                 return opcionfinal
             case 4:
@@ -83,14 +83,13 @@ def menuLecturaSensores() -> int:
     while continuar:
         print("Menu de Lecturas de Sensores")
         print("1: Agregar Lectura de Sensor")               
-        print("2: Cargar Lecturas de Sensor desde el Archivo XML")
-        print("3: Ver Lecturas por Sensor")
-        print("4: Ver Lectura por Parcela")
-        print("5: Ver Lectura por Fecha")
-        print("6: Borrar informacion de sensor por fecha")
-        print("7: Atras")
+        print("2: Ver Lecturas por Sensor")
+        print("3: Ver Lecturas por Parcela")
+        print("4: Ver Lectura por Fecha")
+        print("5: Borrar informacion de sensor por fecha")
+        print("6: Atras")
         opcionfinal = obtenerInputUsuario()
-        if opcionfinal < 1 or opcionfinal > 7:
+        if opcionfinal < 1 or opcionfinal > 6:
             print("Opcion no valida, intente de nuevo.")
             continue
         return opcionfinal + 30
