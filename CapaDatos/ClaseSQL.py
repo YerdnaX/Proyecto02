@@ -1,18 +1,19 @@
-import pyodbc
+﻿import pyodbc
 from datetime import datetime
 
 
 class ClaseSQL:
     def __init__(self):
         self.conexion = pyodbc.connect(
-            "Driver={ODBC Driver 17 for SQL Server};"
-            "Server=localhost\\SQLEXPRESS;"
-            "Database=AgroMon;"
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=localhost;"
+            "DATABASE=AgroMon;"
             "Trusted_Connection=yes;"
+            "TrustServerCertificate=yes;"
         )
         self.cursor = self.conexion.cursor()
 
-    # ========== PARCELAS ==========
+    # ========== PARCELAS ===========
     def insertarParcela(self, parcela):
         self.cursor.execute(
             """
@@ -64,7 +65,7 @@ class ClaseSQL:
         self.cursor.execute("DELETE FROM Parcelas WHERE idParcela=?", idParcela)
         self.conexion.commit()
 
-    # ========== SENSORES ==========
+    # ========== SENSORES ===========
     def insertarSensor(self, sensor):
         self.cursor.execute(
             """
@@ -110,7 +111,7 @@ class ClaseSQL:
         self.cursor.execute("DELETE FROM Sensores WHERE idSensor=?", idSensor)
         self.conexion.commit()
 
-    # ========== CALCULO RIEGO ==========
+    # ========== CALCULO RIEGO ===========
     def insertarCalculoRiego(self, calculo):
         fecha_valor = calculo["fecha"]
         try:

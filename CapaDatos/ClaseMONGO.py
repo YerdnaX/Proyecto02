@@ -13,18 +13,12 @@ class ClaseMONGO:
     def obtenerLecturas(self):
         return list(self.db.Lecturas.find({}))
 
-    def obtenerLecturasPorSensor(self, idSensor):
-        return list(self.db.Lecturas.find({"idSensor": idSensor}))
-
     # ========== ALERTAS ==========
     def insertarAlerta(self, alerta):
         self.db.Alertas.insert_one(alerta.transformarDiccionario())
 
     def obtenerAlertas(self):
         return list(self.db.Alertas.find({}))
-
-    def obtenerAlertasPorParcela(self, idParcela):
-        return list(self.db.Alertas.find({"idParcela": idParcela}))
 
     def eliminarLecturasPorParcelaYFecha(self, idParcela, fecha):
         resultado = self.db.Lecturas.delete_many(
