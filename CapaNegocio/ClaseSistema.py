@@ -138,6 +138,7 @@ def cargar_calculos_riego_db():
 def cargar_lecturas_desde_xml(ruta="./Lecturas.xml"):
     """Carga lecturas desde un XML y las inserta en MongoDB (omite duplicados por idLectura)."""
     nuevos = 0
+    cargar_sensores_db()  # asegure rangos y tipos cargados para generar alertas
     lecturas = cargarLecturasXML(ruta)
     ids_existentes = {lec.idLectura for lec in ListaLecturas}
     for dic in lecturas:
@@ -149,6 +150,7 @@ def cargar_lecturas_desde_xml(ruta="./Lecturas.xml"):
         determinarAlertas(lectura)
         nuevos += 1
     cargar_lecturas_db()
+    cargar_alertas_db()
     return nuevos
 
 

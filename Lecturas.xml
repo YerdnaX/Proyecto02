@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Lecturas>
-	<Lectura><idLectura>17</idLectura><idSensor>12</idSensor><idParcela>101</idParcela><fechaHora>28-10-2025 23:28:57</fechaHora><valorMedido>20</valorMedido></Lectura>
-	<Lectura><idLectura>117</idLectura><idSensor>12</idSensor><idParcela>101</idParcela><fechaHora>28-10-2025 23:28:57</fechaHora><valorMedido>20</valorMedido></Lectura>
+	<Lectura><idLectura>17</idLectura><idSensor>1414</idSensor><idParcela>1414</idParcela><fechaHora>28-10-2025 23:28:57</fechaHora><valorMedido>20</valorMedido></Lectura>
+	<Lectura><idLectura>117</idLectura><idSensor>1414</idSensor><idParcela>1414</idParcela><fechaHora>28-10-2025 23:28:57</fechaHora><valorMedido>20</valorMedido></Lectura>
 </Lecturas>
