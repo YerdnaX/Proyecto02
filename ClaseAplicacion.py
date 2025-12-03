@@ -1,11 +1,8 @@
-from CapaNegocio import ClaseSistema as svc
-from ClaseVisual import App
+from ClaseVisual import run
 
 
 def main():
-    svc.cargar_datos_iniciales()
-    app = App()
-    app.mainloop()
+    run()
 
 
 if __name__ == "__main__":
