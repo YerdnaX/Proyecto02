@@ -26,7 +26,7 @@ class SensorTab(ttk.Frame):
         for col, text in headings:
             self.tree.heading(col, text=text)
             self.tree.column(col, width=110, anchor="w")
-        self.tree.bind("<<TreeviewSelect>>", self._on_select)
+        self.tree.bind("<<TreeviewSelect>>", self.enSeleccion)
         self.tree.grid(row=0, column=0, columnspan=4, sticky="nsew", padx=4, pady=4)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -44,27 +44,27 @@ class SensorTab(ttk.Frame):
             entry.grid(row=1 + i // 2, column=(i % 2) * 2 + 1, sticky="ew", padx=2, pady=1)
             self.inputs[label] = entry
 
-        ttk.Button(self, text="Crear/Actualizar", command=self.save).grid(row=5, column=0, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Eliminar", command=self.delete).grid(row=5, column=1, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Refrescar", command=self.refresh).grid(row=5, column=2, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Crear/Actualizar", command=self.guardar).grid(row=5, column=0, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Eliminar", command=self.eliminar).grid(row=5, column=1, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Refrescar", command=self.refrescar).grid(row=5, column=2, padx=4, pady=6, sticky="ew")
         ttk.Label(self, text="Filtrar por parcela").grid(row=6, column=0, padx=2, pady=2, sticky="w")
         self.filter_entry = ttk.Entry(self, width=20)
         self.filter_entry.grid(row=6, column=1, padx=2, pady=2, sticky="ew")
-        ttk.Button(self, text="Aplicar filtro", command=self.filter_by_parcela).grid(row=6, column=2, padx=2, pady=2, sticky="ew")
+        ttk.Button(self, text="Aplicar filtro", command=self.filtrarParcela).grid(row=6, column=2, padx=2, pady=2, sticky="ew")
 
-        self.refresh()
+        self.refrescar()
 
-    def _on_select(self, _event):
+    def enSeleccion(self, _event):
         sel = self.tree.selection()
         if not sel:
             return
         sid = sel[0]
         for s in svc.listar_sensores():
             if s["idSensor"] == sid:
-                self._fill_form(s)
+                self.llenarForm(s)
                 break
 
-    def _fill_form(self, data):
+    def llenarForm(self, data):
         mapping = {
             "ID": "idSensor",
             "Tipo": "tipo",
@@ -78,7 +78,7 @@ class SensorTab(ttk.Frame):
             self.inputs[label].delete(0, tk.END)
             self.inputs[label].insert(0, data.get(key, ""))
 
-    def filter_by_parcela(self):
+    def filtrarParcela(self):
         pid = _safe_get(self.filter_entry)
         self.tree.delete(*self.tree.get_children())
         sensores = [s for s in svc.listar_sensores() if (not pid or s["idParcela"] == pid)]
@@ -98,7 +98,7 @@ class SensorTab(ttk.Frame):
                 ),
             )
 
-    def save(self):
+    def guardar(self):
         data = {
             "idSensor": _safe_get(self.inputs["ID"]),
             "tipo": _safe_get(self.inputs["Tipo"]).lower(),
@@ -116,23 +116,23 @@ class SensorTab(ttk.Frame):
             else:
                 svc.crear_sensor(data)
                 messagebox.showinfo("Listo", "Sensor creado")
-            self.refresh()
+            self.refrescar()
         except Exception as exc:
             messagebox.showerror("Error", str(exc))
 
-    def delete(self):
+    def eliminar(self):
         sid = _safe_get(self.inputs["ID"])
         if not sid:
             messagebox.showwarning("Falta ID", "Ingrese el ID del sensor")
             return
         try:
             svc.eliminar_sensor(sid)
-            self.refresh()
+            self.refrescar()
             messagebox.showinfo("Listo", "Sensor eliminado")
         except Exception as exc:
             messagebox.showerror("Error", str(exc))
 
-    def _clear_form(self):
+    def limpiarForm(self):
         for label, widget in self.inputs.items():
             if hasattr(widget, "set"):
                 widget.set("")
@@ -140,8 +140,8 @@ class SensorTab(ttk.Frame):
                 widget.delete(0, tk.END)
         self.filter_entry.delete(0, tk.END)
 
-    def refresh(self):
-        self._clear_form()
+    def refrescar(self):
+        self.limpiarForm()
         self.tree.delete(*self.tree.get_children())
         for s in svc.listar_sensores():
             self.tree.insert(

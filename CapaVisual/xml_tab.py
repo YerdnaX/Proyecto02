@@ -11,11 +11,11 @@ class XmlTab(ttk.Frame):
         self.path_entry = ttk.Entry(self, width=60)
         self.path_entry.insert(0, "./Lecturas.xml")
         self.path_entry.grid(row=0, column=1, padx=6, pady=6, sticky="ew")
-        ttk.Button(self, text="Examinar", command=self.browse).grid(row=0, column=2, padx=6, pady=6, sticky="ew")
+        ttk.Button(self, text="Examinar", command=self.buscadorRuta).grid(row=0, column=2, padx=6, pady=6, sticky="ew")
         ttk.Button(self, text="Cargar lecturas XML", command=self.cargar).grid(row=1, column=0, columnspan=3, padx=6, pady=6, sticky="ew")
         self.columnconfigure(1, weight=1)
 
-    def browse(self):
+    def buscadorRuta(self):
         path = filedialog.askopenfilename(filetypes=[("XML files", "*.xml"), ("Todos", "*.*")])
         if path:
             self.path_entry.delete(0, tk.END)

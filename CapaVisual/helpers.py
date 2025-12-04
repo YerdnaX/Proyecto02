@@ -3,7 +3,6 @@ from tkinter import ttk
 
 
 def _safe_get(entry: tk.Entry) -> str:
-    """Returns trimmed contents of a Tk entry."""
     return entry.get().strip()
 
 

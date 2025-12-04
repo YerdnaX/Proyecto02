@@ -17,7 +17,7 @@ class RiegoTab(ttk.Frame):
         self.fecha_entry.grid(row=0, column=3, padx=2, pady=2, sticky="ew")
 
         ttk.Button(self, text="Calcular", command=self.calcular).grid(row=1, column=0, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Refrescar historial", command=self.refresh_historial).grid(row=1, column=1, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Refrescar historial", command=self.refrescarHistorial).grid(row=1, column=1, padx=4, pady=6, sticky="ew")
 
         self.result_label = ttk.Label(self, text="")
         self.result_label.grid(row=1, column=2, columnspan=2, padx=4, pady=6, sticky="w")
@@ -35,7 +35,7 @@ class RiegoTab(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(2, weight=1)
 
-        self.refresh_historial()
+        self.refrescarHistorial()
 
     def calcular(self):
         pid = _safe_get(self.parcela_entry)
@@ -46,12 +46,12 @@ class RiegoTab(ttk.Frame):
         try:
             resultado = svc.calcular_volumen_riego(pid, fecha)
             self.result_label.config(text=f"Volumen: {resultado['volumenRiego']}")
-            self.refresh_historial()
+            self.refrescarHistorial()
             messagebox.showinfo("Listo", "Calculo guardado")
         except Exception as exc:
             messagebox.showerror("Error", str(exc))
 
-    def refresh_historial(self):
+    def refrescarHistorial(self):
         self.tree.delete(*self.tree.get_children())
         for c in svc.listar_calculos_riego():
             self.tree.insert("", "end", values=(c["idParcela"], c["fecha"], c["volumenRiego"]))

@@ -18,7 +18,7 @@ class App(tk.Tk):
         self.title("AgroMon")
         self.geometry("1000x700")
         apply_modern_dark(self)
-        self._build_menu()
+        self.contruirMenu()
         nb = ttk.Notebook(self)
         nb.pack(fill="both", expand=True)
         nb.add(ParcelaTab(nb), text="Parcelas")
@@ -29,7 +29,7 @@ class App(tk.Tk):
         nb.add(XmlTab(nb), text="Carga XML")
         nb.add(GraficoTab(nb), text="Graficos")
 
-    def _build_menu(self):
+    def contruirMenu(self):
         menubar = tk.Menu(self)
         datos_menu = tk.Menu(menubar, tearoff=0)
         datos_menu.add_command(label="Refrescar datos", command=svc.cargar_datos_iniciales)

@@ -1,10 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-
 import pandas as pd
-
 from CapaNegocio import ClaseSistema as svc
-
 try:
     from matplotlib.figure import Figure
     from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -41,7 +38,7 @@ class GraficoTab(ttk.Frame):
 
     def graficar(self):
         if Figure is None or FigureCanvasTkAgg is None:
-            messagebox.showerror("Dependencia faltante", "Instale matplotlib: pip install matplotlib")
+            messagebox.showerror("Libreria faltante")
             return
         parcela = self.parcela_entry.get().strip()
         sensores_raw = self.sensores_entry.get().strip()

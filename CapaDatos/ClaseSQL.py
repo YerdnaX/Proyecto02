@@ -15,10 +15,7 @@ class ClaseSQL:
 
     # ========== PARCELAS ===========
     def insertarParcela(self, parcela):
-        self.cursor.execute(
-            """
-            INSERT INTO Parcelas VALUES(?,?,?,?,?,?,?,?,?,?)
-            """,
+        self.cursor.execute("""INSERT INTO Parcelas VALUES(?,?,?,?,?,?,?,?,?,?)""",
             (
                 parcela.idParcela,
                 parcela.nombre,

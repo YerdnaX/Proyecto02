@@ -27,7 +27,7 @@ class ParcelaTab(ttk.Frame):
         for col, text in headings:
             self.tree.heading(col, text=text)
             self.tree.column(col, width=110, anchor="w")
-        self.tree.bind("<<TreeviewSelect>>", self._on_select)
+        self.tree.bind("<<TreeviewSelect>>", self.enSeleccion)
         self.tree.grid(row=0, column=0, columnspan=4, sticky="nsew", padx=4, pady=4)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -51,23 +51,23 @@ class ParcelaTab(ttk.Frame):
             entry.grid(row=1 + i // 2, column=(i % 2) * 2 + 1, sticky="ew", padx=2, pady=1)
             self.inputs[label] = entry
 
-        ttk.Button(self, text="Crear/Actualizar", command=self.save).grid(row=6, column=0, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Eliminar", command=self.delete).grid(row=6, column=1, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Refrescar", command=self.refresh).grid(row=6, column=2, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Crear/Actualizar", command=self.guardar).grid(row=6, column=0, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Eliminar", command=self.eliminar).grid(row=6, column=1, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Refrescar", command=self.refrescarTOdo).grid(row=6, column=2, padx=4, pady=6, sticky="ew")
 
-        self.refresh()
+        self.refrescarTOdo()
 
-    def _on_select(self, _event):
+    def enSeleccion(self, _event):
         sel = self.tree.selection()
         if not sel:
             return
         pid = sel[0]
         for p in svc.listar_parcelas():
             if p["idParcela"] == pid:
-                self._fill_form(p)
+                self.llenarForm(p)
                 break
 
-    def _fill_form(self, data):
+    def llenarForm(self, data):
         mapping = {
             "ID": "idParcela",
             "Nombre": "nombre",
@@ -84,8 +84,8 @@ class ParcelaTab(ttk.Frame):
             self.inputs[label].delete(0, tk.END)
             self.inputs[label].insert(0, data.get(key, ""))
 
-    def refresh(self):
-        self._clear_form()
+    def refrescarTOdo(self):
+        self.limpiarForm()
         self.tree.delete(*self.tree.get_children())
         for p in svc.listar_parcelas():
             self.tree.insert(
@@ -104,11 +104,11 @@ class ParcelaTab(ttk.Frame):
                 ),
             )
 
-    def _clear_form(self):
+    def limpiarForm(self):
         for entry in self.inputs.values():
             entry.delete(0, tk.END)
 
-    def save(self):
+    def guardar(self):
         data = {
             "idParcela": _safe_get(self.inputs["ID"]),
             "nombre": _safe_get(self.inputs["Nombre"]),
@@ -129,18 +129,18 @@ class ParcelaTab(ttk.Frame):
             else:
                 svc.crear_parcela(data)
                 messagebox.showinfo("Listo", "Parcela creada")
-            self.refresh()
+            self.refrescarTOdo()
         except Exception as exc:
             messagebox.showerror("Error", str(exc))
 
-    def delete(self):
+    def eliminar(self):
         pid = _safe_get(self.inputs["ID"])
         if not pid:
             messagebox.showwarning("Falta ID", "Ingrese el ID de la parcela")
             return
         try:
             svc.eliminar_parcela(pid)
-            self.refresh()
+            self.refrescarTOdo()
             messagebox.showinfo("Listo", "Parcela eliminada")
         except Exception as exc:
             messagebox.showerror("Error", str(exc))

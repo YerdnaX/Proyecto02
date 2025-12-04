@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import os
 
-
+# ========== CARGARLECTURAS ==========
 def cargarLecturasXML(ruta: str = "./Lecturas.xml") -> list:
     """Carga lecturas desde un archivo XML en la ruta dada."""
     lista_lecturas = []

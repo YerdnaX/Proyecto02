@@ -37,14 +37,14 @@ class AlertaTab(ttk.Frame):
         self.fecha_entry = ttk.Entry(self, width=20)
         self.fecha_entry.grid(row=1, column=3, padx=2, pady=1, sticky="ew")
 
-        ttk.Button(self, text="Filtrar por parcela", command=self.filter_parcela).grid(row=2, column=0, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Filtrar por parcela/fecha", command=self.filter_parcela_fecha).grid(row=2, column=1, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Refrescar", command=self.refresh_all).grid(row=2, column=2, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Filtrar por parcela", command=self.filtrarParcela).grid(row=2, column=0, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Filtrar por parcela/fecha", command=self.filtrarParcelaFecha).grid(row=2, column=1, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Refrescar", command=self.refrescarTodo).grid(row=2, column=2, padx=4, pady=6, sticky="ew")
 
-        self.refresh_all()
+        self.refrescarTodo()
 
-    def refresh_all(self, data=None):
-        self._clear_form()
+    def refrescarTodo(self, data=None):
+        self.limpiarForm()
         self.tree.delete(*self.tree.get_children())
         alertas = data if data is not None else svc.listar_alertas()
         for a in alertas:
@@ -54,21 +54,21 @@ class AlertaTab(ttk.Frame):
                 values=(a["idParcela"], a["idSensor"], a["tipo"], a["fechaGeneracion"], a["valorDetectado"], a["mensajeAlerta"]),
             )
 
-    def filter_parcela(self):
+    def filtrarParcela(self):
         pid = _safe_get(self.parcela_entry)
         if not pid:
             messagebox.showwarning("Falta dato", "Ingrese ID de parcela")
             return
-        self.refresh_all(svc.alertas_por_parcela(pid))
+        self.refrescarTodo(svc.alertas_por_parcela(pid))
 
-    def filter_parcela_fecha(self):
+    def filtrarParcelaFecha(self):
         pid = _safe_get(self.parcela_entry)
         fecha = _safe_get(self.fecha_entry)
         if not pid or not fecha:
             messagebox.showwarning("Falta dato", "Ingrese parcela y fecha (DD-MM-YYYY)")
             return
-        self.refresh_all(svc.alertas_por_parcela_fecha(pid, fecha))
+        self.refrescarTodo(svc.alertas_por_parcela_fecha(pid, fecha))
 
-    def _clear_form(self):
+    def limpiarForm(self):
         self.parcela_entry.delete(0, tk.END)
         self.fecha_entry.delete(0, tk.END)

@@ -35,17 +35,17 @@ class LecturaTab(ttk.Frame):
             entry.grid(row=1 + i // 2, column=(i % 2) * 2 + 1, sticky="ew", padx=2, pady=1)
             self.inputs[label] = entry
 
-        ttk.Button(self, text="Agregar lectura", command=self.save).grid(row=4, column=0, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Filtrar por sensor", command=self.filter_sensor).grid(row=4, column=1, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Filtrar por parcela", command=self.filter_parcela).grid(row=4, column=2, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Filtrar por fecha", command=self.filter_fecha).grid(row=4, column=3, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Borrar por parcela/fecha", command=self.delete_por_parcela_fecha).grid(row=5, column=0, padx=4, pady=6, sticky="ew")
-        ttk.Button(self, text="Refrescar", command=self.refresh_all).grid(row=5, column=1, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Agregar lectura", command=self.guardar).grid(row=4, column=0, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Filtrar por sensor", command=self.filtrarSensor).grid(row=4, column=1, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Filtrar por parcela", command=self.filtrarParcela).grid(row=4, column=2, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Filtrar por fecha", command=self.filtrarFecha).grid(row=4, column=3, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Borrar por parcela/fecha", command=self.eliminarporparcelafecha).grid(row=5, column=0, padx=4, pady=6, sticky="ew")
+        ttk.Button(self, text="Refrescar", command=self.refrescarTodo).grid(row=5, column=1, padx=4, pady=6, sticky="ew")
 
-        self.refresh_all()
+        self.refrescarTodo()
 
-    def refresh_all(self, data=None):
-        self._clear_form()
+    def refrescarTodo(self, data=None):
+        self.limpiarForm()
         self.tree.delete(*self.tree.get_children())
         lecturas = data if data is not None else svc.listar_lecturas()
         for l in lecturas:
@@ -56,7 +56,7 @@ class LecturaTab(ttk.Frame):
                 values=(l["idLectura"], l["idSensor"], l["idParcela"], l["fechaHora"], l["valorMedido"]),
             )
 
-    def save(self):
+    def guardar(self):
         data = {
             "idLectura": _safe_get(self.inputs["ID Lectura"]),
             "idSensor": _safe_get(self.inputs["ID Sensor"]),
@@ -67,32 +67,32 @@ class LecturaTab(ttk.Frame):
         try:
             svc.crear_lectura(data)
             messagebox.showinfo("Listo", "Lectura creada")
-            self.refresh_all()
+            self.refrescarTodo()
         except Exception as exc:
             messagebox.showerror("Error", str(exc))
 
-    def filter_sensor(self):
+    def filtrarSensor(self):
         sid = _safe_get(self.inputs["ID Sensor"])
         if not sid:
             messagebox.showwarning("Falta dato", "Ingrese ID de sensor")
             return
-        self.refresh_all(svc.lecturas_por_sensor(sid))
+        self.refrescarTodo(svc.lecturas_por_sensor(sid))
 
-    def filter_parcela(self):
+    def filtrarParcela(self):
         pid = _safe_get(self.inputs["ID Parcela"])
         if not pid:
             messagebox.showwarning("Falta dato", "Ingrese ID de parcela")
             return
-        self.refresh_all(svc.lecturas_por_parcela(pid))
+        self.refrescarTodo(svc.lecturas_por_parcela(pid))
 
-    def filter_fecha(self):
+    def filtrarFecha(self):
         fecha = _safe_get(self.inputs["FechaHora (DD-MM-YYYY HH:MM:SS)"])[:10]
         if not fecha:
             messagebox.showwarning("Falta dato", "Ingrese fecha (DD-MM-YYYY)")
             return
-        self.refresh_all(svc.lecturas_por_fecha(fecha))
+        self.refrescarTodo(svc.lecturas_por_fecha(fecha))
 
-    def delete_por_parcela_fecha(self):
+    def eliminarporparcelafecha(self):
         pid = _safe_get(self.inputs["ID Parcela"])
         fecha = _safe_get(self.inputs["FechaHora (DD-MM-YYYY HH:MM:SS)"])[:10]
         if not pid or not fecha:
@@ -100,11 +100,11 @@ class LecturaTab(ttk.Frame):
             return
         try:
             borradas = svc.borrar_lecturas_parcela_fecha(pid, fecha)
-            self.refresh_all()
+            self.refrescarTodo()
             messagebox.showinfo("Listo", f"Eliminadas {borradas} lecturas")
         except Exception as exc:
             messagebox.showerror("Error", str(exc))
 
-    def _clear_form(self):
+    def limpiarForm(self):
         for entry in self.inputs.values():
             entry.delete(0, tk.END)
